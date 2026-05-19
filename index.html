@@ -338,47 +338,33 @@
   // Called from hub card clicks
   function openGame(src, title) {
     const id = src.includes('english') ? 'english' : 'math';
-    history.pushState({ game: id }, '', BASE + id);
+    history.replaceState(null, '', BASE + id);
     overlayShow(src, title);
   }
 
   function closeGame() {
+    history.replaceState(null, '', BASE);
     overlayHide();
-    const { game } = getRoute();
-    if (game) history.back(); // pop /english or /math entry
   }
 
-  // Restore state on initial load (bookmark or 404-redirect)
+  // Restore on load — handles bookmarks and 404-redirect deep links
   window.addEventListener('DOMContentLoaded', function () {
-    // Restore path saved by 404.html
     const saved = sessionStorage.getItem('spa-redirect');
     if (saved) {
       sessionStorage.removeItem('spa-redirect');
-      const url = new URL(saved);
-      history.replaceState(null, '', url.pathname + url.search);
+      history.replaceState(null, '', new URL(saved).pathname);
     }
-    const { game, tab } = getRoute();
-    if (GAMES[game]) {
-      const src = GAMES[game].src + (tab ? '?tab=' + tab : '');
-      overlayShow(src, GAMES[game].title);
-    }
-  });
-
-  // Browser back / forward
-  window.addEventListener('popstate', function () {
     const { game, tab } = getRoute();
     if (GAMES[game]) {
       overlayShow(GAMES[game].src + (tab ? '?tab=' + tab : ''), GAMES[game].title);
-    } else {
-      overlayHide();
     }
   });
 
-  // Tab change from English iframe — replaceState, no extra history entry
+  // Tab change from English iframe
   window.addEventListener('message', function (e) {
     if (e.data && e.data.type === 'tabChange') {
       const { game } = getRoute();
-      if (game) history.replaceState({}, '', BASE + game + '/' + e.data.tab);
+      if (game) history.replaceState(null, '', BASE + game + '/' + e.data.tab);
     }
   });
 
