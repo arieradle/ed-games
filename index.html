@@ -312,8 +312,14 @@
     english: { src: 'english_practice.html',  title: '🌟 English Adventure' }
   };
 
-  // Base path: '/ed-games/' on GitHub Pages, '/' on localhost
-  const BASE = '/' + (location.pathname.split('/').filter(Boolean)[0] || '') + '/';
+  // Base path: '/ed-games/' on GitHub Pages, '/' on localhost.
+  // Detects by checking if the first path segment is a known game id — if not,
+  // it must be the repo prefix (e.g. 'ed-games').
+  const BASE = (() => {
+    const GAME_IDS = new Set(['math', 'english']);
+    const seg = location.pathname.split('/').filter(Boolean);
+    return (seg.length && !GAME_IDS.has(seg[0])) ? '/' + seg[0] + '/' : '/';
+  })();
 
   // Parse /ed-games/english/bingo → { game:'english', tab:'bingo' }
   function getRoute() {

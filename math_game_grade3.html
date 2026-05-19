@@ -654,6 +654,12 @@
     if (!val) { document.getElementById('nameInput').focus(); return; }
     playerName = val;
 
+    // register player in storage so they appear as a chip on next visit
+    try {
+      const d = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+      if (!d[playerName]) { d[playerName] = []; localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); }
+    } catch(e) {}
+
     document.getElementById('welcomeScreen').style.display = 'none';
     document.getElementById('gameScreen').style.display = 'flex';
     document.getElementById('playerName').textContent = playerName;
