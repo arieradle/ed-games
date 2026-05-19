@@ -7,7 +7,7 @@
 <style>
 :root{--green:#4CAF50;--red:#f44336;--blue:#2196F3;--purple:#9C27B0;--orange:#FF9800;--teal:#009688;--pink:#E91E63;}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Segoe UI',Arial,sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);min-height:100vh;padding:10px;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);min-height:100vh;padding:10px 16px;}
 h1{text-align:center;color:#fff;font-size:1.9em;margin:8px 0 4px;text-shadow:2px 2px 4px rgba(0,0,0,.3);}
 .subtitle{text-align:center;color:#ffe;font-size:.9em;margin-bottom:10px;}
 
@@ -22,7 +22,7 @@ h1{text-align:center;color:#fff;font-size:1.9em;margin:8px 0 4px;text-shadow:2px
 .tbBingo{background:#9C27B0;} .tbSpeed{background:#FF5722;} .tbOdd{background:#009688;} .tbLadder{background:#795548;} .tbSent{background:#E91E63;}
 
 /* PANEL */
-.panel{background:#fff;border-radius:18px;padding:20px;max-width:760px;margin:0 auto;box-shadow:0 8px 28px rgba(0,0,0,.2);display:none;}
+.panel{background:#fff;border-radius:18px;padding:20px;max-width:960px;margin:0 auto;box-shadow:0 8px 28px rgba(0,0,0,.2);display:none;}
 .panel.active{display:block;}
 
 /* SCORE BAR */
@@ -225,6 +225,22 @@ h1{text-align:center;color:#fff;font-size:1.9em;margin:8px 0 4px;text-shadow:2px
   margin-bottom:6px;
 }
 #playerBadge strong{color:#fff;}
+
+/* ── Wide (≥900px): more columns, bigger grids ── */
+@media(min-width:900px){
+  body{padding:16px 32px;}
+  .panel{padding:28px 32px;}
+  h1{font-size:2.1em;}
+  .tab-btn{padding:9px 18px;font-size:.92em;}
+  .c4{grid-template-columns:repeat(4,1fr);}
+  .mem-grid.g8{grid-template-columns:repeat(4,1fr);}
+  .mem-grid.g12{grid-template-columns:repeat(6,1fr);}
+  .mem-grid.g16{grid-template-columns:repeat(8,1fr);}
+  .bingo-grid{grid-template-columns:repeat(5,1fr);}
+  .odd-card{grid-template-columns:repeat(4,1fr);}
+  .q-word{font-size:2.4em;}
+  .q-emoji{font-size:3.8em;}
+}
 
 /* ── 600 px ── */
 @media(max-width:600px){
