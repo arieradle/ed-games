@@ -335,13 +335,14 @@
     document.body.style.overflow = '';
   }
 
-  // Called from hub card clicks
+  // Called from hub card clicks — one push so browser back closes the game
   function openGame(src, title) {
     const id = src.includes('english') ? 'english' : 'math';
-    history.replaceState(null, '', BASE + id);
+    history.pushState({ game: id }, '', BASE + id);
     overlayShow(src, title);
   }
 
+  // In-app back button — replace (not push) so no extra entry is added
   function closeGame() {
     history.replaceState(null, '', BASE);
     overlayHide();
@@ -352,7 +353,9 @@
     const saved = sessionStorage.getItem('spa-redirect');
     if (saved) {
       sessionStorage.removeItem('spa-redirect');
-      history.replaceState(null, '', new URL(saved).pathname);
+      // Insert hub behind the game so browser back lands on hub, not off-site
+      history.replaceState(null, '', BASE);
+      history.pushState(null, '', new URL(saved).pathname);
     }
     const { game, tab } = getRoute();
     if (GAMES[game]) {
@@ -360,7 +363,17 @@
     }
   });
 
-  // Tab change from English iframe
+  // Browser back/forward — sync overlay to whatever the URL now shows
+  window.addEventListener('popstate', function () {
+    const { game, tab } = getRoute();
+    if (GAMES[game]) {
+      overlayShow(GAMES[game].src + (tab ? '?tab=' + tab : ''), GAMES[game].title);
+    } else {
+      overlayHide();
+    }
+  });
+
+  // Tab change from English iframe — replace, no extra history entry
   window.addEventListener('message', function (e) {
     if (e.data && e.data.type === 'tabChange') {
       const { game } = getRoute();
