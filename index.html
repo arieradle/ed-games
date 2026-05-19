@@ -307,18 +307,52 @@
 </div>
 
 <script>
-  function openGame(src, title) {
+  const GAMES = {
+    math:    { src: 'math_game_grade3.html',  title: '🧮 משחק חשבון' },
+    english: { src: 'english_practice.html',  title: '🌟 English Adventure' }
+  };
+
+  function openGame(src, title, pushHistory) {
+    const id = src.includes('english') ? 'english' : 'math';
     document.getElementById('gameFrame').src = src;
     document.getElementById('overlayTitle').textContent = title;
     document.getElementById('gameOverlay').classList.add('open');
     document.body.style.overflow = 'hidden';
+    if (pushHistory !== false) history.pushState({ game: id }, '', '#' + id);
   }
 
   function closeGame() {
     document.getElementById('gameOverlay').classList.remove('open');
     document.getElementById('gameFrame').src = '';
     document.body.style.overflow = '';
+    history.pushState({}, '', location.pathname + location.search);
   }
+
+  // Restore game from URL hash on load
+  window.addEventListener('DOMContentLoaded', function () {
+    const hash = location.hash.replace('#', '').split('/')[0];
+    if (GAMES[hash]) openGame(GAMES[hash].src, GAMES[hash].title, false);
+  });
+
+  // Browser back/forward
+  window.addEventListener('popstate', function () {
+    const hash = location.hash.replace('#', '').split('/')[0];
+    if (GAMES[hash]) {
+      openGame(GAMES[hash].src, GAMES[hash].title, false);
+    } else {
+      document.getElementById('gameOverlay').classList.remove('open');
+      document.getElementById('gameFrame').src = '';
+      document.body.style.overflow = '';
+    }
+  });
+
+  // Tab change messages from english game iframe
+  window.addEventListener('message', function (e) {
+    if (e.data && e.data.type === 'tabChange') {
+      const current = location.hash.split('/')[0] || '#english';
+      history.replaceState({}, '', current + '/' + e.data.tab);
+    }
+  });
 
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') closeGame();

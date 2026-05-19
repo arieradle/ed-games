@@ -8,21 +8,56 @@
 :root{--green:#4CAF50;--red:#f44336;--blue:#2196F3;--purple:#9C27B0;--orange:#FF9800;--teal:#009688;--pink:#E91E63;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Segoe UI',Arial,sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);min-height:100vh;padding:10px 16px;}
-h1{text-align:center;color:#fff;font-size:1.9em;margin:8px 0 4px;text-shadow:2px 2px 4px rgba(0,0,0,.3);}
-.subtitle{text-align:center;color:#ffe;font-size:.9em;margin-bottom:10px;}
 
-/* TABS */
-.tab-section{margin-bottom:6px;}
-.tab-label{text-align:center;color:rgba(255,255,255,.7);font-size:.78em;font-weight:bold;margin-bottom:4px;letter-spacing:1px;}
-.tabs{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-bottom:4px;}
-.tab-btn{padding:8px 14px;border:none;border-radius:20px;font-size:.88em;font-weight:bold;cursor:pointer;transition:all .22s;color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.2);}
-.tab-btn:hover{transform:translateY(-2px);}
-.tab-btn.active{box-shadow:0 0 0 3px #fff;transform:scale(1.07);}
+/* ── TOP BAR ── */
+.eng-topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 16px;background:rgba(0,0,0,.18);border-radius:14px;
+  margin-bottom:10px;gap:10px;flex-wrap:wrap;
+}
+.eng-title{color:#fff;font-size:1.25em;font-weight:800;white-space:nowrap;}
+#playerBadge{
+  color:rgba(255,255,255,.9);font-size:.88em;display:flex;
+  align-items:center;gap:8px;
+}
+#playerBadge strong{color:#fff;}
+#playerBadge button{
+  background:rgba(255,255,255,.18);border:none;color:#fff;
+  border-radius:10px;padding:3px 10px;font-size:.85em;cursor:pointer;
+}
+#playerBadge button:hover{background:rgba(255,255,255,.3);}
+
+/* ── LAYOUT ── */
+.eng-body{display:flex;gap:12px;align-items:flex-start;}
+.eng-content{flex:1;min-width:0;}
+
+/* ── SIDEBAR NAV ── */
+.eng-nav{
+  display:flex;flex-direction:column;gap:5px;
+  flex-shrink:0;width:148px;
+  position:sticky;top:12px;
+}
+.nav-group-label{
+  font-size:.68em;font-weight:800;letter-spacing:.1em;
+  color:rgba(255,255,255,.55);padding:8px 4px 2px;
+}
+.tab-btn{
+  width:100%;text-align:left;padding:9px 12px;border:none;
+  border-radius:12px;font-size:.85em;font-weight:700;
+  cursor:pointer;transition:all .18s;color:#fff;
+  box-shadow:0 2px 6px rgba(0,0,0,.2);
+  display:flex;align-items:center;gap:6px;
+}
+.tab-btn small{font-size:.78em;opacity:.75;margin-right:auto;}
+.tab-btn:hover{filter:brightness(1.12);transform:translateX(2px);}
+.tab-btn.active{box-shadow:0 0 0 3px #fff,0 2px 6px rgba(0,0,0,.2);}
 .tb1{background:#4CAF50;} .tb2{background:#FF9800;} .tb3{background:#f44336;} .tbM{background:#2196F3;}
 .tbBingo{background:#9C27B0;} .tbSpeed{background:#FF5722;} .tbOdd{background:#009688;} .tbLadder{background:#795548;} .tbSent{background:#E91E63;}
 
+/* ── PANEL (now inside eng-content, no max-width cap needed) ── */
+
 /* PANEL */
-.panel{background:#fff;border-radius:18px;padding:20px;max-width:960px;margin:0 auto;box-shadow:0 8px 28px rgba(0,0,0,.2);display:none;}
+.panel{background:#fff;border-radius:18px;padding:20px;width:100%;box-shadow:0 8px 28px rgba(0,0,0,.2);display:none;}
 .panel.active{display:block;}
 
 /* SCORE BAR */
@@ -226,12 +261,29 @@ h1{text-align:center;color:#fff;font-size:1.9em;margin:8px 0 4px;text-shadow:2px
 }
 #playerBadge strong{color:#fff;}
 
-/* ── Wide (≥900px): more columns, bigger grids ── */
-@media(min-width:900px){
-  body{padding:16px 32px;}
-  .panel{padding:28px 32px;}
-  h1{font-size:2.1em;}
-  .tab-btn{padding:9px 18px;font-size:.92em;}
+/* ── Mobile (≤600px): sidebar → horizontal scroll strip ── */
+@media(max-width:600px){
+  .eng-body{flex-direction:column;gap:8px;}
+  .eng-nav{
+    width:100%;flex-direction:row;flex-wrap:nowrap;
+    overflow-x:auto;position:static;
+    padding-bottom:4px;gap:6px;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .eng-nav::-webkit-scrollbar{display:none;}
+  .nav-group-label{display:none;}
+  .tab-btn{
+    width:auto;flex-shrink:0;white-space:nowrap;
+    padding:8px 12px;font-size:.82em;
+  }
+}
+
+/* ── Wide (≥960px): more columns, bigger grids ── */
+@media(min-width:960px){
+  body{padding:16px 24px;}
+  .panel{padding:24px 28px;}
+  .eng-nav{width:160px;}
   .c4{grid-template-columns:repeat(4,1fr);}
   .mem-grid.g8{grid-template-columns:repeat(4,1fr);}
   .mem-grid.g12{grid-template-columns:repeat(6,1fr);}
@@ -242,23 +294,9 @@ h1{text-align:center;color:#fff;font-size:1.9em;margin:8px 0 4px;text-shadow:2px
   .q-emoji{font-size:3.8em;}
 }
 
-/* ── 600 px ── */
-@media(max-width:600px){
-  body{padding:6px;}
-  h1{font-size:1.5em;}
-  .panel{padding:14px;}
-  .tab-btn{padding:7px 10px;font-size:.82em;}
-  .bingo-grid{grid-template-columns:repeat(3,1fr);}
-  .mem-grid.g16{grid-template-columns:repeat(4,1fr);}
-  .clock-display{font-size:2.2em;}
-}
-
 /* ── 480 px ── */
 @media(max-width:480px){
-  h1{font-size:1.3em;}
-  .subtitle{font-size:.8em;}
-  .panel{padding:10px 10px;}
-  .tab-btn{padding:6px 9px;font-size:.78em;}
+  .panel{padding:10px;}
   .c3,.c4{grid-template-columns:repeat(2,1fr);}
   .mem-grid.g8,.mem-grid.g12,.mem-grid.g16{grid-template-columns:repeat(3,1fr);}
   .odd-card{grid-template-columns:1fr;}
@@ -278,8 +316,6 @@ h1{text-align:center;color:#fff;font-size:1.9em;margin:8px 0 4px;text-shadow:2px
 
 /* ── 360 px ── */
 @media(max-width:360px){
-  h1{font-size:1.1em;}
-  .tab-btn{padding:5px 7px;font-size:.73em;}
   .c3,.c4{grid-template-columns:repeat(2,1fr);}
   .mem-grid.g8,.mem-grid.g12,.mem-grid.g16{grid-template-columns:repeat(3,1fr);}
   .bingo-grid{grid-template-columns:repeat(3,1fr);}
@@ -308,27 +344,33 @@ h1{text-align:center;color:#fff;font-size:1.9em;margin:8px 0 4px;text-shadow:2px
 </div>
 
 <div id="engGame" style="display:none">
-<p id="playerBadge">Hello, <strong id="engPlayerName"></strong>! 👋 &nbsp;<button onclick="engSwitchPlayer()" style="background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:12px;padding:3px 10px;font-size:.85em;cursor:pointer;">Switch</button></p>
-<h1>🌟 English Adventure 🌟</h1>
-<p class="subtitle">בחר רמה או משחק | Choose a level or a game</p>
 
-<div class="tab-section">
-  <div class="tab-label">— PRACTICE LEVELS —</div>
-  <div class="tabs">
-    <button class="tab-btn tb1 active" onclick="showTab('level1',this)">⭐ Level 1<br><small>קל</small></button>
-    <button class="tab-btn tb2" onclick="showTab('level2',this)">⭐⭐ Level 2<br><small>בינוני</small></button>
-    <button class="tab-btn tb3" onclick="showTab('level3',this)">⭐⭐⭐ Level 3<br><small>מאתגר</small></button>
-    <button class="tab-btn tbM" onclick="showTab('memory',this)">🃏 Memory<br><small>זיכרון</small></button>
+<div class="eng-topbar">
+  <div class="eng-title">🌟 English Adventure</div>
+  <div id="playerBadge">Hello, <strong id="engPlayerName"></strong>! 👋
+    <button onclick="engSwitchPlayer()">Switch</button>
   </div>
-  <div class="tab-label">— BONUS GAMES —</div>
-  <div class="tabs">
+</div>
+
+<div class="eng-body">
+
+  <!-- ── SIDEBAR / TAB NAV ── -->
+  <nav class="eng-nav">
+    <div class="nav-group-label">LEVELS</div>
+    <button class="tab-btn tb1 active" onclick="showTab('level1',this)">⭐ Level 1 <small>קל</small></button>
+    <button class="tab-btn tb2" onclick="showTab('level2',this)">⭐⭐ Level 2 <small>בינוני</small></button>
+    <button class="tab-btn tb3" onclick="showTab('level3',this)">⭐⭐⭐ Level 3 <small>מאתגר</small></button>
+    <button class="tab-btn tbM" onclick="showTab('memory',this)">🃏 Memory</button>
+    <div class="nav-group-label">BONUS</div>
     <button class="tab-btn tbBingo" onclick="showTab('bingo',this)">🎯 Bingo</button>
     <button class="tab-btn tbSpeed" onclick="showTab('speed',this)">⏱️ Speed</button>
     <button class="tab-btn tbOdd" onclick="showTab('odd',this)">🤔 Odd One Out</button>
     <button class="tab-btn tbLadder" onclick="showTab('ladder',this)">🪜 Ladder</button>
     <button class="tab-btn tbSent" onclick="showTab('sentences',this)">📝 Sentences</button>
-  </div>
-</div>
+  </nav>
+
+  <!-- ── GAME PANELS ── -->
+  <div class="eng-content">
 
 <!-- ═══ LEVEL 1 ═══ -->
 <div id="level1" class="panel active">
@@ -481,6 +523,8 @@ h1{text-align:center;color:#fff;font-size:1.9em;margin:8px 0 4px;text-shadow:2px
   </div>
   <div class="results" id="sent-res"><div class="res-emoji" id="sent-re"></div><div class="stars" id="sent-rs"></div><div class="res-score" id="sent-rsc"></div><div class="res-msg" id="sent-rm"></div><button class="play-again-btn" onclick="startSentences()">🔄 שחק שוב!</button></div>
 </div>
+  </div><!-- /eng-content -->
+</div><!-- /eng-body -->
 </div><!-- /engGame -->
 
 <script>
@@ -1288,6 +1332,19 @@ function showTab(id,btn){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   btn.classList.add('active');
+  // routing: update URL (works standalone and when embedded in hub iframe)
+  try {
+    if(window.top !== window){
+      window.top.postMessage({type:'tabChange', tab: id}, '*');
+    } else {
+      history.replaceState({tab: id}, '', '#' + id);
+    }
+  } catch(e){}
+}
+
+function activateTabById(id){
+  const btn = document.querySelector(`.tab-btn[onclick*="'${id}'"]`);
+  if(btn && document.getElementById(id)) showTab(id, btn);
 }
 
 // Topic bars for levels
@@ -1361,18 +1418,24 @@ function engStart(){
   if(!val){ document.getElementById('engNameInput').focus(); return; }
   engSaveName(val);
   document.getElementById('engPlayerName').textContent = val;
-  document.getElementById('playerBadge').style.display = 'block';
   document.getElementById('welcomeOverlay').style.display = 'none';
   document.getElementById('engGame').style.display = 'block';
+  // restore tab from URL hash if present
+  const hashTab = (location.hash||'').replace('#','').split('/').pop();
+  if(hashTab && document.getElementById(hashTab)) activateTabById(hashTab);
 }
 
 function engSwitchPlayer(){
   document.getElementById('engGame').style.display = 'none';
-  document.getElementById('playerBadge').style.display = 'none';
   document.getElementById('welcomeOverlay').style.display = 'flex';
   document.getElementById('engNameInput').value = '';
   engInitWelcome();
 }
+
+// Handle tab deep-link from parent hub: #english/level2
+window.addEventListener('message', function(e){
+  if(e.data && e.data.type === 'openTab') activateTabById(e.data.tab);
+});
 
 engInitWelcome();
 </script>
