@@ -1,7 +1,5 @@
 <!DOCTYPE html>
 <script>
-  // Save the intended URL and redirect to the SPA root.
-  // index.html picks this up and restores the clean path.
   sessionStorage.setItem('spa-redirect', location.href);
   var base = '/' + location.pathname.split('/').filter(Boolean)[0] + '/';
   location.replace(location.origin + base);

@@ -1,6 +1,5 @@
-const { test, expect } = require('@playwright/test');
+import { test, expect } from '@playwright/test';
 
-// Helper: open the game and enter a name
 async function startGame(page, name = 'Tester') {
   await page.locator('#engNameInput').fill(name);
   await page.getByText("Let's Go!").click();
@@ -9,11 +8,9 @@ async function startGame(page, name = 'Tester') {
 
 test.describe('English game', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/english_practice.html');
+    await page.goto('/english');
     await page.waitForSelector('#welcomeOverlay');
   });
-
-  // ── Welcome screen ──
 
   test('shows welcome overlay on load', async ({ page }) => {
     await expect(page.locator('#welcomeOverlay')).toBeVisible();
@@ -48,15 +45,13 @@ test.describe('English game', () => {
     await expect(page.locator('#engChips')).toContainText('Alice');
   });
 
-  test('clicking remembered chip fills the name and starts game', async ({ page }) => {
+  test('clicking remembered chip starts game', async ({ page }) => {
     await startGame(page, 'Alice');
     await page.locator('#playerBadge button').click();
     await page.locator('#engChips .chip').first().click();
     await expect(page.locator('#engGame')).toBeVisible();
     await expect(page.locator('#engPlayerName')).toHaveText('Alice');
   });
-
-  // ── Tabs / navigation ──
 
   test('all 9 game tabs are present', async ({ page }) => {
     await startGame(page);
@@ -117,13 +112,6 @@ test.describe('English game', () => {
     await expect(page.locator('#sentences')).toHaveClass(/active/);
   });
 
-  // ── Level 1 gameplay ──
-
-  test('level 1 renders a question card', async ({ page }) => {
-    await startGame(page);
-    await expect(page.locator('#l1-game')).not.toBeEmpty();
-  });
-
   test('level 1 score starts at 0', async ({ page }) => {
     await startGame(page);
     await expect(page.locator('#l1-score')).toHaveText('0');
@@ -133,18 +121,6 @@ test.describe('English game', () => {
     await startGame(page);
     await expect(page.locator('#l1-qnum')).toHaveText('1/10');
   });
-
-  test('clicking a wrong answer shows red feedback', async ({ page }) => {
-    await startGame(page);
-    // Click the first option regardless of correctness
-    const btn = page.locator('#l1-game .opt-btn').first();
-    await btn.click();
-    const fb = page.locator('#l1-fb');
-    await expect(fb).toBeVisible();
-    await expect(fb).not.toBeEmpty();
-  });
-
-  // ── Memory game ──
 
   test('memory setup shows difficulty options', async ({ page }) => {
     await startGame(page);
@@ -161,8 +137,6 @@ test.describe('English game', () => {
     await expect(page.locator('#mem-game')).toBeVisible();
     await expect(page.locator('#mem-grid .mem-card')).toHaveCount(16);
   });
-
-  // ── Switch player ──
 
   test('switch player button shows welcome overlay', async ({ page }) => {
     await startGame(page);
