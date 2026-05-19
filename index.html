@@ -312,6 +312,16 @@
     english: { src: 'english_practice.html',  title: '🌟 English Adventure' }
   };
 
+  // Base path: '/ed-games/' on GitHub Pages, '/' on localhost
+  const BASE = '/' + (location.pathname.split('/').filter(Boolean)[0] || '') + '/';
+
+  // Parse /ed-games/english/bingo → { game:'english', tab:'bingo' }
+  function getRoute() {
+    const rel = location.pathname.slice(BASE.length); // 'english/bingo'
+    const parts = rel.split('/').filter(Boolean);
+    return { game: parts[0] || null, tab: parts[1] || null };
+  }
+
   function overlayShow(src, title) {
     document.getElementById('gameFrame').src = src;
     document.getElementById('overlayTitle').textContent = title;
@@ -325,41 +335,50 @@
     document.body.style.overflow = '';
   }
 
-  function openGame(src, title, push) {
+  // Called from hub card clicks
+  function openGame(src, title) {
     const id = src.includes('english') ? 'english' : 'math';
+    history.pushState({ game: id }, '', BASE + id);
     overlayShow(src, title);
-    if (push !== false) history.pushState({ game: id }, '', '?game=' + id);
   }
 
   function closeGame() {
     overlayHide();
-    history.back(); // pop the ?game= entry — clean, no double-push
+    const { game } = getRoute();
+    if (game) history.back(); // pop /english or /math entry
   }
 
-  // On load: restore from ?game= query param (bookmarks, direct links)
+  // Restore state on initial load (bookmark or 404-redirect)
   window.addEventListener('DOMContentLoaded', function () {
-    const p = new URLSearchParams(location.search);
-    const g = p.get('game');
-    if (GAMES[g]) overlayShow(GAMES[g].src, GAMES[g].title);
+    // Restore path saved by 404.html
+    const saved = sessionStorage.getItem('spa-redirect');
+    if (saved) {
+      sessionStorage.removeItem('spa-redirect');
+      const url = new URL(saved);
+      history.replaceState(null, '', url.pathname + url.search);
+    }
+    const { game, tab } = getRoute();
+    if (GAMES[game]) {
+      const src = GAMES[game].src + (tab ? '?tab=' + tab : '');
+      overlayShow(src, GAMES[game].title);
+    }
   });
 
-  // Browser back/forward
+  // Browser back / forward
   window.addEventListener('popstate', function () {
-    const p = new URLSearchParams(location.search);
-    const g = p.get('game');
-    if (GAMES[g]) {
-      overlayShow(GAMES[g].src, GAMES[g].title);
+    const { game, tab } = getRoute();
+    if (GAMES[game]) {
+      overlayShow(GAMES[game].src + (tab ? '?tab=' + tab : ''), GAMES[game].title);
     } else {
       overlayHide();
     }
   });
 
-  // Tab change messages from English iframe → replaceState keeps URL clean
+  // Tab change from English iframe — replaceState, no extra history entry
   window.addEventListener('message', function (e) {
     if (e.data && e.data.type === 'tabChange') {
-      const p = new URLSearchParams(location.search);
-      p.set('tab', e.data.tab);
-      history.replaceState({}, '', '?' + p.toString());
+      const { game } = getRoute();
+      if (game) history.replaceState({}, '', BASE + game + '/' + e.data.tab);
     }
   });
 

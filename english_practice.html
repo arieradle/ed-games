@@ -1332,14 +1332,12 @@ function showTab(id,btn){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   btn.classList.add('active');
-  // routing: notify parent hub (iframe) or update own URL (standalone)
+  // routing: notify parent hub (iframe) or update own ?tab= (standalone)
   try {
     if (window.top !== window) {
       window.top.postMessage({ type: 'tabChange', tab: id }, '*');
     } else {
-      const p = new URLSearchParams(location.search);
-      p.set('tab', id);
-      history.replaceState({ tab: id }, '', '?' + p.toString());
+      history.replaceState({ tab: id }, '', '?tab=' + id);
     }
   } catch(e) {}
 }
@@ -1422,12 +1420,9 @@ function engStart(){
   document.getElementById('engPlayerName').textContent = val;
   document.getElementById('welcomeOverlay').style.display = 'none';
   document.getElementById('engGame').style.display = 'block';
-  // restore tab from parent ?tab= param (hub) or own ?tab= (standalone)
-  try {
-    const src = window.top !== window ? window.top.location.search : location.search;
-    const tab = new URLSearchParams(src).get('tab');
-    if (tab && document.getElementById(tab)) activateTabById(tab);
-  } catch(e) {}
+  // restore tab from ?tab= on our own URL (hub sets this when loading the iframe)
+  const initTab = new URLSearchParams(location.search).get('tab');
+  if (initTab && document.getElementById(initTab)) activateTabById(initTab);
 }
 
 function engSwitchPlayer(){
