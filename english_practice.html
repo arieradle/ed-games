@@ -181,6 +181,51 @@ h1{text-align:center;color:#fff;font-size:1.9em;margin:8px 0 4px;text-shadow:2px
 .word-tile:disabled{background:#eee;border-color:#ccc;color:#ccc;cursor:default;transform:none;}
 .sent-btns{display:flex;gap:8px;justify-content:center;}
 
+/* ── WELCOME OVERLAY ── */
+#welcomeOverlay{
+  position:fixed;inset:0;z-index:9999;
+  background:linear-gradient(135deg,#667eea,#764ba2);
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;
+}
+.welcome-box{
+  background:#fff;border-radius:22px;padding:36px 28px 32px;
+  width:100%;max-width:380px;text-align:center;
+  box-shadow:0 12px 48px rgba(0,0,0,0.25);
+}
+.welcome-box .w-emoji{font-size:3.5em;margin-bottom:10px;}
+.welcome-box h2{font-size:1.7em;font-weight:800;color:#764ba2;margin-bottom:4px;}
+.welcome-box p{color:#888;font-size:.9em;margin-bottom:22px;}
+.welcome-box input{
+  width:100%;font-size:1.4em;text-align:center;
+  border:3px solid #ddd;border-radius:14px;padding:11px;
+  outline:none;margin-bottom:14px;
+  font-family:inherit;transition:border-color .2s;
+}
+.welcome-box input:focus{border-color:#764ba2;}
+.welcome-box button.go-btn{
+  width:100%;padding:13px;border:none;border-radius:14px;
+  background:linear-gradient(135deg,#667eea,#764ba2);
+  color:#fff;font-size:1.05em;font-weight:700;cursor:pointer;
+  transition:filter .15s;
+}
+.welcome-box button.go-btn:hover{filter:brightness(1.1);}
+.welcome-box .known-players{margin-top:16px;}
+.welcome-box .kp-label{font-size:.78em;color:#aaa;margin-bottom:8px;}
+.welcome-box .chips{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;}
+.welcome-box .chip{
+  padding:5px 14px;border:2px solid #ddd;border-radius:20px;
+  font-size:.85em;font-weight:600;cursor:pointer;background:#fff;color:#555;
+  transition:all .18s;
+}
+.welcome-box .chip:hover{border-color:#764ba2;color:#764ba2;}
+#playerBadge{
+  display:none;text-align:center;
+  font-size:.88em;color:rgba(255,255,255,.85);
+  margin-bottom:6px;
+}
+#playerBadge strong{color:#fff;}
+
 /* ── 600 px ── */
 @media(max-width:600px){
   body{padding:6px;}
@@ -229,6 +274,25 @@ h1{text-align:center;color:#fff;font-size:1.9em;margin:8px 0 4px;text-shadow:2px
 </style>
 </head>
 <body>
+
+<!-- ── WELCOME OVERLAY ── -->
+<div id="welcomeOverlay">
+  <div class="welcome-box">
+    <div class="w-emoji">🌟</div>
+    <h2>English Adventure</h2>
+    <p>What's your name? | מה שמך?</p>
+    <input type="text" id="engNameInput" placeholder="Type your name..." maxlength="20"
+           onkeydown="if(event.key==='Enter') engStart()">
+    <button class="go-btn" onclick="engStart()">Let's Go! 🚀</button>
+    <div class="known-players" id="engKnownPlayers" style="display:none">
+      <div class="kp-label">or pick a name / או בחר שם:</div>
+      <div class="chips" id="engChips"></div>
+    </div>
+  </div>
+</div>
+
+<div id="engGame" style="display:none">
+<p id="playerBadge">Hello, <strong id="engPlayerName"></strong>! 👋 &nbsp;<button onclick="engSwitchPlayer()" style="background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:12px;padding:3px 10px;font-size:.85em;cursor:pointer;">Switch</button></p>
 <h1>🌟 English Adventure 🌟</h1>
 <p class="subtitle">בחר רמה או משחק | Choose a level or a game</p>
 
@@ -401,6 +465,7 @@ h1{text-align:center;color:#fff;font-size:1.9em;margin:8px 0 4px;text-shadow:2px
   </div>
   <div class="results" id="sent-res"><div class="res-emoji" id="sent-re"></div><div class="stars" id="sent-rs"></div><div class="res-score" id="sent-rsc"></div><div class="res-msg" id="sent-rm"></div><button class="play-again-btn" onclick="startSentences()">🔄 שחק שוב!</button></div>
 </div>
+</div><!-- /engGame -->
 
 <script>
 // ══════════════════════════════════════
@@ -1240,6 +1305,60 @@ buildSpeedTopicBar();
 startOdd();
 startLadder();
 startSentences();
+
+// ── WELCOME / NAME SCREEN ──
+const ENG_KEY = 'enggame_players';
+
+function engGetPlayers(){
+  try{ return JSON.parse(localStorage.getItem(ENG_KEY)||'[]'); }catch{ return []; }
+}
+function engSaveName(name){
+  try{
+    const arr = engGetPlayers().filter(n=>n!==name);
+    arr.unshift(name);
+    localStorage.setItem(ENG_KEY, JSON.stringify(arr.slice(0,8)));
+  }catch(e){}
+}
+
+function engInitWelcome(){
+  const players = engGetPlayers();
+  const chipsEl = document.getElementById('engChips');
+  const knownEl = document.getElementById('engKnownPlayers');
+  chipsEl.innerHTML = '';
+  if(players.length){
+    knownEl.style.display = 'block';
+    players.forEach(name=>{
+      const btn = document.createElement('button');
+      btn.className = 'chip';
+      btn.textContent = '👤 '+name;
+      btn.onclick = ()=>{ document.getElementById('engNameInput').value=name; engStart(); };
+      chipsEl.appendChild(btn);
+    });
+  } else {
+    knownEl.style.display = 'none';
+  }
+  setTimeout(()=>document.getElementById('engNameInput').focus(), 100);
+}
+
+function engStart(){
+  const val = document.getElementById('engNameInput').value.trim();
+  if(!val){ document.getElementById('engNameInput').focus(); return; }
+  engSaveName(val);
+  document.getElementById('engPlayerName').textContent = val;
+  document.getElementById('playerBadge').style.display = 'block';
+  document.getElementById('welcomeOverlay').style.display = 'none';
+  document.getElementById('engGame').style.display = 'block';
+}
+
+function engSwitchPlayer(){
+  document.getElementById('engGame').style.display = 'none';
+  document.getElementById('playerBadge').style.display = 'none';
+  document.getElementById('welcomeOverlay').style.display = 'flex';
+  document.getElementById('engNameInput').value = '';
+  engInitWelcome();
+}
+
+engInitWelcome();
 </script>
 </body>
 </html>
